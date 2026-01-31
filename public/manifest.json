@@ -1,0 +1,23 @@
+{
+  "name": "Event Chaos: Live Production Simulator",
+  "short_name": "Event Chaos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#06b6d4",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "description": "Master the art of live event production in this intense strategy simulator. Manage sound, lights, and video systems under extreme pressure."
+}
