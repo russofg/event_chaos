@@ -1,0 +1,5 @@
+{
+  "name": "Event Chaos: Live Production Simulator",
+  "description": "A high-stakes real-time management simulation where you control the dashboard of a live event. Manage Sound, Lights, Video, and Stage systems while battling random failures, client demands, and stress levels.",
+  "requestFramePermissions": []
+}
