@@ -5,9 +5,10 @@ import { MessageSquare, X, User, BookOpen, Radio } from 'lucide-react';
 interface NarrativePopupProps {
   narrative: NarrativeEvent;
   onDismiss: () => void;
+  mobile?: boolean;
 }
 
-export const NarrativePopup: React.FC<NarrativePopupProps> = ({ narrative, onDismiss }) => {
+export const NarrativePopup: React.FC<NarrativePopupProps> = ({ narrative, onDismiss, mobile = false }) => {
   const getIcon = () => {
     switch (narrative.type) {
       case 'CHARACTER': return <User className="w-5 h-5" />;
@@ -27,8 +28,8 @@ export const NarrativePopup: React.FC<NarrativePopupProps> = ({ narrative, onDis
   };
 
   return (
-    <div className="absolute bottom-32 right-8 z-[90] animate-in slide-in-from-right duration-500 max-w-md w-full">
-      <div className={`border-2 ${getColor()} rounded-xl shadow-2xl p-4 backdrop-blur-md relative overflow-hidden`}>
+    <div className={`${mobile ? 'relative w-full shrink-0 animate-in slide-in-from-right duration-500 pointer-events-auto' : 'absolute bottom-28 md:bottom-32 left-2 right-2 md:left-auto md:right-8 z-[90] animate-in slide-in-from-right duration-500 md:max-w-md md:w-full'}`}>
+      <div className={`border-2 ${getColor()} rounded-xl shadow-2xl ${mobile ? 'p-3' : 'p-4'} backdrop-blur-md relative overflow-hidden`}>
         {/* Background pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none"></div>
         

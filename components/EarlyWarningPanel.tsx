@@ -4,10 +4,17 @@ import { AlertTriangle, Clock, CheckCircle } from 'lucide-react';
 
 interface EarlyWarningPanelProps {
   warnings: EarlyWarning[];
+  mobile?: boolean;
+  maxItems?: number;
 }
 
-export const EarlyWarningPanel: React.FC<EarlyWarningPanelProps> = ({ warnings }) => {
+export const EarlyWarningPanel: React.FC<EarlyWarningPanelProps> = ({
+  warnings,
+  mobile = false,
+  maxItems
+}) => {
   if (warnings.length === 0) return null;
+  const visibleWarnings = typeof maxItems === 'number' ? warnings.slice(0, Math.max(1, maxItems)) : warnings;
 
   const getSeverityColor = (severity: 'LOW' | 'MEDIUM' | 'HIGH') => {
     switch (severity) {
@@ -18,8 +25,8 @@ export const EarlyWarningPanel: React.FC<EarlyWarningPanelProps> = ({ warnings }
   };
 
   return (
-    <div className="absolute top-20 left-8 z-[100] w-80 space-y-2 max-h-[calc(100vh-120px)] overflow-y-auto">
-      {warnings.map(warning => (
+    <div className={`${mobile ? 'relative w-full shrink-0 space-y-2 pointer-events-auto' : 'absolute top-20 left-2 right-2 md:left-8 md:right-auto z-[100] md:w-80 space-y-2 max-h-[calc(100vh-120px)] overflow-y-auto'}`}>
+      {visibleWarnings.map(warning => (
         <div
           key={warning.id}
           className={`border-l-4 ${getSeverityColor(warning.severity)} rounded-r-lg p-3 shadow-lg backdrop-blur-sm animate-in slide-in-from-right`}
@@ -60,6 +67,11 @@ export const EarlyWarningPanel: React.FC<EarlyWarningPanelProps> = ({ warnings }
           )}
         </div>
       ))}
+      {warnings.length > visibleWarnings.length && (
+        <div className="aaa-chip px-2 py-1 text-[10px] font-mono text-slate-200 text-center">
+          +{warnings.length - visibleWarnings.length} advertencias más en cola
+        </div>
+      )}
     </div>
   );
 };

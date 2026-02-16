@@ -23,6 +23,16 @@ export const Shop: React.FC<ShopProps> = ({ currentBudget, inventory, onBuy, onS
       }
   };
 
+  const getEffectLabel = (item: ShopItem) => {
+    if (item.effect === 'STABILITY' || item.effect === 'STRESS_RESIST') {
+      return `${item.effect.replace('_', ' ')} +${item.value}%`;
+    }
+    if (item.effect === 'AUTO_HEAL') {
+      return `${item.effect.replace('_', ' ')} +${item.value}%/tick`;
+    }
+    return `${item.effect.replace('_', ' ')} +$${item.value}`;
+  };
+
   return (
     <div className="h-screen w-screen bg-slate-950 flex flex-col items-center justify-center p-8 relative overflow-hidden">
         {/* Background Grid */}
@@ -100,7 +110,7 @@ export const Shop: React.FC<ShopProps> = ({ currentBudget, inventory, onBuy, onS
                                         <div>
                                             <h3 className="font-bold text-white text-sm">{item.name}</h3>
                                             <div className="text-[10px] text-emerald-400 font-mono flex items-center">
-                                                {item.effect.replace('_', ' ')} +{item.value * 100}%
+                                                {getEffectLabel(item)}
                                             </div>
                                         </div>
                                     </div>

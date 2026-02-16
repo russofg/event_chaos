@@ -79,6 +79,12 @@ export interface GameScenario {
   contextPrompt: string;
   initialBudget: number;
   isTutorial?: boolean;
+  unlockRequirements?: {
+    minCompletedScenarios?: number;
+    minHardScenarios?: number;
+    minReputation?: number;
+    requiredScenarioIds?: string[];
+  };
 }
 
 export interface CrewMember {
@@ -98,6 +104,7 @@ export interface CareerData {
     unlockedAchievements: string[];
     unlockedUpgrades: string[];
     careerPoints: number; // Puntos para desbloquear mejoras
+    reputation: number; // Progreso de carrera para desbloqueos avanzados
 }
 
 export interface TutorialStep {
@@ -132,6 +139,7 @@ export interface MissionDefinition {
     holdDuration: number; // Seconds needed to hold
     timeout: number; // Seconds to complete
     rewardCash: number;
+    allowedScenarios?: string[];
 }
 
 export interface ActiveMission extends MissionDefinition {
@@ -207,6 +215,7 @@ export interface PermanentUpgrade {
   cost: number; // Career points
   category: 'REFLEXES' | 'KNOWLEDGE' | 'RESISTANCE' | 'EFFICIENCY' | 'SPECIAL';
   effect: (stats: GameStats, systems: Record<SystemType, SystemState>) => void;
+  requires?: string[];
   unlocked: boolean;
 }
 

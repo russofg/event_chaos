@@ -164,7 +164,49 @@ export const SCENARIOS: GameScenario[] = [
     description: 'El desafío definitivo',
     difficulty: 'EXTREME',
     contextPrompt: 'Extreme challenge with maximum difficulty',
-    initialBudget: 4000
+    initialBudget: 4000,
+    unlockRequirements: {
+      minHardScenarios: 2
+    }
+  },
+  {
+    id: 'ARENA',
+    title: 'Tour de Arena',
+    description: 'Producción en venue grande con cambios rápidos de cue',
+    difficulty: 'HARD',
+    contextPrompt: 'Arena concert with complex transitions and aggressive pacing',
+    initialBudget: 6500,
+    unlockRequirements: {
+      minCompletedScenarios: 4,
+      minReputation: 30
+    }
+  },
+  {
+    id: 'WORLD_TOUR',
+    title: 'World Tour Live',
+    description: 'Evento internacional en vivo con máxima exigencia técnica',
+    difficulty: 'EXTREME',
+    contextPrompt: 'Global live broadcast tour with high pressure production constraints',
+    initialBudget: 4800,
+    unlockRequirements: {
+      minCompletedScenarios: 5,
+      minHardScenarios: 2,
+      minReputation: 70
+    }
+  },
+  {
+    id: 'BLACKOUT_PROTOCOL',
+    title: 'Blackout Protocol',
+    description: 'Modo supervivencia de producción con fallas encadenadas',
+    difficulty: 'EXTREME',
+    contextPrompt: 'Cascading technical failures under severe budget and stress conditions',
+    initialBudget: 3600,
+    unlockRequirements: {
+      minCompletedScenarios: 6,
+      minHardScenarios: 3,
+      minReputation: 120,
+      requiredScenarioIds: ['WORLD_TOUR']
+    }
   }
 ];
 
@@ -229,10 +271,185 @@ export const CLIENT_MISSIONS: MissionDefinition[] = [
     holdDuration: 20,
     timeout: 60,
     rewardCash: 800
+  },
+  {
+    id: 'balanced_mix',
+    title: 'Mezcla de Precisión',
+    description: 'Mantén SOUND, VIDEO y STAGE en zona segura (45-55%) por 12 segundos',
+    criteria: [
+      { systemId: SystemType.SOUND, min: 45, max: 55 },
+      { systemId: SystemType.VIDEO, min: 45, max: 55 },
+      { systemId: SystemType.STAGE, min: 45, max: 55 }
+    ],
+    holdDuration: 12,
+    timeout: 40,
+    rewardCash: 650
+  },
+  {
+    id: 'visual_impact',
+    title: 'Impacto Visual',
+    description: 'Sostén LIGHTS y VIDEO arriba de 70% durante 10 segundos',
+    criteria: [
+      { systemId: SystemType.LIGHTS, min: 70 },
+      { systemId: SystemType.VIDEO, min: 70 }
+    ],
+    holdDuration: 10,
+    timeout: 35,
+    rewardCash: 700
+  },
+  {
+    id: 'stage_security',
+    title: 'Escenario Seguro',
+    description: 'Mantén STAGE entre 35-50% y SOUND entre 40-55% por 18 segundos',
+    criteria: [
+      { systemId: SystemType.STAGE, min: 35, max: 50 },
+      { systemId: SystemType.SOUND, min: 40, max: 55 }
+    ],
+    holdDuration: 18,
+    timeout: 55,
+    rewardCash: 900
+  },
+  {
+    id: 'full_throttle',
+    title: 'Modo Festival',
+    description: 'Lleva SOUND, LIGHTS y STAGE por encima de 75% por 8 segundos',
+    criteria: [
+      { systemId: SystemType.SOUND, min: 75 },
+      { systemId: SystemType.LIGHTS, min: 75 },
+      { systemId: SystemType.STAGE, min: 75 }
+    ],
+    holdDuration: 8,
+    timeout: 30,
+    rewardCash: 1000
+  },
+  {
+    id: 'cooldown_window',
+    title: 'Ventana de Calma',
+    description: 'Baja todos los sistemas entre 25-40% durante 14 segundos',
+    criteria: [
+      { systemId: SystemType.SOUND, min: 25, max: 40 },
+      { systemId: SystemType.LIGHTS, min: 25, max: 40 },
+      { systemId: SystemType.VIDEO, min: 25, max: 40 },
+      { systemId: SystemType.STAGE, min: 25, max: 40 }
+    ],
+    holdDuration: 14,
+    timeout: 45,
+    rewardCash: 750
+  },
+  {
+    id: 'arena_transition',
+    title: 'Transición de Arena',
+    description: 'Sincroniza SOUND, LIGHTS y VIDEO en rango alto de precisión',
+    criteria: [
+      { systemId: SystemType.SOUND, min: 58, max: 72 },
+      { systemId: SystemType.LIGHTS, min: 62, max: 78 },
+      { systemId: SystemType.VIDEO, min: 55, max: 70 }
+    ],
+    holdDuration: 11,
+    timeout: 36,
+    rewardCash: 950,
+    allowedScenarios: ['ARENA', 'WORLD_TOUR', 'BLACKOUT_PROTOCOL']
+  },
+  {
+    id: 'pyro_guard',
+    title: 'Guardia de Pyro',
+    description: 'Mantén STAGE estable con LIGHTS altas sin perder control',
+    criteria: [
+      { systemId: SystemType.STAGE, min: 42, max: 55 },
+      { systemId: SystemType.LIGHTS, min: 68 }
+    ],
+    holdDuration: 12,
+    timeout: 40,
+    rewardCash: 1100,
+    allowedScenarios: ['ARENA', 'WORLD_TOUR']
+  },
+  {
+    id: 'broadcast_lock',
+    title: 'Bloque de Broadcast',
+    description: 'Alinea SOUND y VIDEO en ventana de transmisión internacional',
+    criteria: [
+      { systemId: SystemType.SOUND, min: 48, max: 58 },
+      { systemId: SystemType.VIDEO, min: 52, max: 62 }
+    ],
+    holdDuration: 14,
+    timeout: 42,
+    rewardCash: 1250,
+    allowedScenarios: ['WORLD_TOUR', 'BLACKOUT_PROTOCOL']
+  },
+  {
+    id: 'blackout_containment',
+    title: 'Contención de Blackout',
+    description: 'Mantén todos los sistemas en zona segura durante crisis encadenada',
+    criteria: [
+      { systemId: SystemType.SOUND, min: 45, max: 60 },
+      { systemId: SystemType.LIGHTS, min: 45, max: 60 },
+      { systemId: SystemType.VIDEO, min: 45, max: 60 },
+      { systemId: SystemType.STAGE, min: 45, max: 60 }
+    ],
+    holdDuration: 16,
+    timeout: 38,
+    rewardCash: 1450,
+    allowedScenarios: ['BLACKOUT_PROTOCOL']
+  },
+  {
+    id: 'precision_drop',
+    title: 'Drop de Precisión',
+    description: 'Mantén SOUND y LIGHTS en ventana estrecha durante la caída musical',
+    criteria: [
+      { systemId: SystemType.SOUND, min: 48, max: 56 },
+      { systemId: SystemType.LIGHTS, min: 44, max: 52 }
+    ],
+    holdDuration: 10,
+    timeout: 34,
+    rewardCash: 680,
+    allowedScenarios: ['NORMAL', 'ROCKSTAR']
+  },
+  {
+    id: 'arena_split_cue',
+    title: 'Split Cue de Arena',
+    description: 'Sincroniza audio/video y conserva estabilidad de escenario en transición de acto',
+    criteria: [
+      { systemId: SystemType.SOUND, min: 62, max: 76 },
+      { systemId: SystemType.VIDEO, min: 58, max: 72 },
+      { systemId: SystemType.STAGE, min: 40, max: 55 }
+    ],
+    holdDuration: 12,
+    timeout: 37,
+    rewardCash: 1180,
+    allowedScenarios: ['ARENA', 'WORLD_TOUR']
+  },
+  {
+    id: 'tour_broadcast_sync',
+    title: 'Sync de Broadcast Global',
+    description: 'Alinea SOUND, LIGHTS y VIDEO para ventana de transmisión internacional',
+    criteria: [
+      { systemId: SystemType.SOUND, min: 50, max: 60 },
+      { systemId: SystemType.LIGHTS, min: 55, max: 68 },
+      { systemId: SystemType.VIDEO, min: 54, max: 66 }
+    ],
+    holdDuration: 15,
+    timeout: 44,
+    rewardCash: 1350,
+    allowedScenarios: ['WORLD_TOUR']
+  },
+  {
+    id: 'blackout_triage',
+    title: 'Triage de Blackout',
+    description: 'Sostén sistemas críticos en zona media mientras se estabiliza la red',
+    criteria: [
+      { systemId: SystemType.SOUND, min: 46, max: 60 },
+      { systemId: SystemType.LIGHTS, min: 46, max: 60 },
+      { systemId: SystemType.VIDEO, min: 46, max: 60 },
+      { systemId: SystemType.STAGE, min: 40, max: 55 }
+    ],
+    holdDuration: 18,
+    timeout: 41,
+    rewardCash: 1600,
+    allowedScenarios: ['BLACKOUT_PROTOCOL', 'EXTREME']
   }
 ];
 
-// System Events - 47 eventos totales distribuidos por sistemas y escenarios
+// System Events distribuidos por sistemas y escenarios
 export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
   [SystemType.SOUND]: [
     // Eventos básicos de SOUND (todos los escenarios)
@@ -247,7 +464,8 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       priority: 7,
       canEscalate: true,
       escalationEvent: 'Ruido de Masa (Hum)',
-      escalationTime: 25
+      escalationTime: 25,
+      relatedTo: ['Luces de Colores Desincronizadas', 'Sincronización Perdida']
     },
     {
       title: 'Ruido de Masa (Hum)',
@@ -260,7 +478,8 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       priority: 6,
       canEscalate: true,
       escalationEvent: 'Caída de Sistema Completo',
-      escalationTime: 30
+      escalationTime: 30,
+      relatedTo: ['DMX Desconectado', 'Sincronización Perdida']
     },
     {
       title: 'Cable Cortado',
@@ -283,7 +502,8 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
         { label: 'Usar sistema de respaldo', isCorrect: true, stressImpact: -10, cost: 800 },
         { label: 'Continuar sin sonido', isCorrect: false, stressImpact: 40 }
       ],
-      priority: 10
+      priority: 10,
+      relatedTo: ['Corte de Energía en Luces', 'Fallo Total de Video', 'Corte de Energía Total']
     },
     {
       title: 'Micrófono Sin Sonido',
@@ -372,6 +592,28 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       ],
       priority: 5,
       allowedScenarios: ['ROCKSTAR', 'FESTIVAL']
+    },
+    {
+      title: 'Matriz de Delay Corrupta',
+      description: 'La matriz digital de delay perdió su ruteo principal',
+      options: [
+        { label: 'Restaurar snapshot de audio', isCorrect: true, stressImpact: -8, cost: 250 },
+        { label: 'Rerutear manualmente canales críticos', isCorrect: true, stressImpact: -5 },
+        { label: 'Bypass completo de la matriz', isCorrect: false, stressImpact: 18 }
+      ],
+      priority: 8,
+      allowedScenarios: ['ARENA', 'WORLD_TOUR', 'BLACKOUT_PROTOCOL']
+    },
+    {
+      title: 'Retorno IEM Fuera de Fase',
+      description: 'Los in-ear monitors del artista principal están fuera de fase',
+      options: [
+        { label: 'Corregir polaridad y fase', isCorrect: true, stressImpact: -6 },
+        { label: 'Cambiar a mezcla alternativa', isCorrect: true, stressImpact: -4, cost: 180 },
+        { label: 'Mantener retorno actual', isCorrect: false, stressImpact: 14 }
+      ],
+      priority: 6,
+      allowedScenarios: ['WORLD_TOUR', 'BLACKOUT_PROTOCOL']
     }
   ],
   [SystemType.LIGHTS]: [
@@ -397,7 +639,8 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       priority: 7,
       canEscalate: true,
       escalationEvent: 'Corte de Energía en Luces',
-      escalationTime: 30
+      escalationTime: 30,
+      relatedTo: ['Problema de Energía', 'Procesador de Video Saturado']
     },
     {
       title: 'Corte de Energía en Luces',
@@ -407,7 +650,8 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
         { label: 'Usar sistema de emergencia', isCorrect: true, stressImpact: -8, cost: 500 },
         { label: 'Continuar a oscuras', isCorrect: false, stressImpact: 35 }
       ],
-      priority: 9
+      priority: 9,
+      relatedTo: ['Caída de Sistema Completo', 'Fallo Total de Video', 'Corte de Energía Total']
     },
     {
       title: 'DMX Desconectado',
@@ -507,6 +751,28 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       ],
       priority: 2,
       allowedScenarios: ['ROCKSTAR', 'FESTIVAL']
+    },
+    {
+      title: 'Timecode de Luces Desfasado',
+      description: 'La secuencia de luces perdió sincronía con el show',
+      options: [
+        { label: 'Reenganchar reloj maestro', isCorrect: true, stressImpact: -8 },
+        { label: 'Pasar a operación manual', isCorrect: true, stressImpact: -5, cost: 220 },
+        { label: 'Dejar correr desfasado', isCorrect: false, stressImpact: 20 }
+      ],
+      priority: 8,
+      allowedScenarios: ['ARENA', 'WORLD_TOUR']
+    },
+    {
+      title: 'Colisión de Universos DMX',
+      description: 'Dos universos DMX están enviando datos conflictivos',
+      options: [
+        { label: 'Segmentar red DMX', isCorrect: true, stressImpact: -10, cost: 260 },
+        { label: 'Activar nodo de respaldo', isCorrect: true, stressImpact: -6, cost: 180 },
+        { label: 'Ignorar conflicto', isCorrect: false, stressImpact: 24 }
+      ],
+      priority: 9,
+      allowedScenarios: ['WORLD_TOUR', 'BLACKOUT_PROTOCOL']
     }
   ],
   [SystemType.VIDEO]: [
@@ -522,7 +788,8 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       priority: 6,
       canEscalate: true,
       escalationEvent: 'Fallo Total de Video',
-      escalationTime: 30
+      escalationTime: 30,
+      relatedTo: ['Timecode de Luces Desfasado', 'Fallo en Sistema de Comunicación']
     },
     {
       title: 'Fallo Total de Video',
@@ -532,7 +799,8 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
         { label: 'Usar sistema de respaldo completo', isCorrect: true, stressImpact: -10, cost: 600 },
         { label: 'Continuar sin video', isCorrect: false, stressImpact: 30 }
       ],
-      priority: 9
+      priority: 9,
+      relatedTo: ['Caída de Sistema Completo', 'Corte de Energía en Luces', 'Corte de Energía Total']
     },
     {
       title: 'Resolución Incorrecta',
@@ -642,6 +910,28 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       ],
       priority: 5,
       allowedScenarios: ['NORMAL', 'ROCKSTAR']
+    },
+    {
+      title: 'Encoder de Streaming Inestable',
+      description: 'El encoder principal está perdiendo frames en la transmisión',
+      options: [
+        { label: 'Reducir bitrate y estabilizar', isCorrect: true, stressImpact: -8 },
+        { label: 'Migrar al encoder backup', isCorrect: true, stressImpact: -5, cost: 300 },
+        { label: 'Mantener encoder actual', isCorrect: false, stressImpact: 22 }
+      ],
+      priority: 8,
+      allowedScenarios: ['WORLD_TOUR', 'BLACKOUT_PROTOCOL']
+    },
+    {
+      title: 'Switcher de Respaldo Bloqueado',
+      description: 'El switcher secundario no acepta cambios de escena',
+      options: [
+        { label: 'Reset de memoria de escenas', isCorrect: true, stressImpact: -7, cost: 150 },
+        { label: 'Reasignar salidas críticas', isCorrect: true, stressImpact: -4 },
+        { label: 'Operar con scene freeze', isCorrect: false, stressImpact: 16 }
+      ],
+      priority: 7,
+      allowedScenarios: ['ARENA', 'BLACKOUT_PROTOCOL']
     }
   ],
   [SystemType.STAGE]: [
@@ -657,7 +947,8 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       priority: 9,
       canEscalate: true,
       escalationEvent: 'Corte de Energía Total',
-      escalationTime: 30
+      escalationTime: 30,
+      relatedTo: ['Sobrecarga de Circuito', 'Fallo Total de Video']
     },
     {
       title: 'Corte de Energía Total',
@@ -667,7 +958,8 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
         { label: 'Reducir todos los sistemas', isCorrect: true, stressImpact: -12 },
         { label: 'Evacuar', isCorrect: false, stressImpact: 60 }
       ],
-      priority: 10
+      priority: 10,
+      relatedTo: ['Caída de Sistema Completo', 'Fallo Total de Video', 'Corte de Energía en Luces']
     },
     {
       title: 'Escenario Inestable',
@@ -778,6 +1070,29 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       ],
       priority: 5,
       allowedScenarios: ['NORMAL', 'ROCKSTAR', 'FESTIVAL']
+    },
+    {
+      title: 'Failover Eléctrico de Arena',
+      description: 'El sistema principal cambió a energía de respaldo sin confirmación',
+      options: [
+        { label: 'Sincronizar tableros y cargas', isCorrect: true, stressImpact: -10, cost: 350 },
+        { label: 'Aislar sectores no críticos', isCorrect: true, stressImpact: -7 },
+        { label: 'Continuar en failover parcial', isCorrect: false, stressImpact: 26 }
+      ],
+      priority: 9,
+      allowedScenarios: ['ARENA', 'WORLD_TOUR']
+    },
+    {
+      title: 'Protocolo Blackout Activado',
+      description: 'El escenario entró en protocolo de contingencia por fallas encadenadas',
+      options: [
+        { label: 'Ejecutar checklist de contingencia', isCorrect: true, stressImpact: -12, cost: 400 },
+        { label: 'Asegurar solo sistemas vitales', isCorrect: true, stressImpact: -9 },
+        { label: 'Reintentar arranque completo', isCorrect: false, stressImpact: 30 }
+      ],
+      priority: 10,
+      relatedTo: ['Matriz de Delay Corrupta', 'Colisión de Universos DMX', 'Encoder de Streaming Inestable'],
+      allowedScenarios: ['BLACKOUT_PROTOCOL']
     }
   ]
 };
@@ -797,7 +1112,7 @@ export const PERMANENT_UPGRADES: PermanentUpgrade[] = [
   {
     id: 'knowledge_1',
     name: 'Conocimiento Técnico I',
-    description: 'Los eventos muestran más información útil',
+    description: '+5% tiempo de misión y mejor anticipación operacional',
     icon: '📚',
     category: 'KNOWLEDGE',
     cost: 40,
@@ -832,6 +1147,7 @@ export const PERMANENT_UPGRADES: PermanentUpgrade[] = [
     category: 'REFLEXES',
     cost: 100,
     effect: () => {},
+    requires: ['reflexes_1'],
     unlocked: false
   },
   {
@@ -842,6 +1158,51 @@ export const PERMANENT_UPGRADES: PermanentUpgrade[] = [
     category: 'RESISTANCE',
     cost: 120,
     effect: () => {},
+    requires: ['resistance_1'],
+    unlocked: false
+  },
+  {
+    id: 'knowledge_2',
+    name: 'Conocimiento Técnico II',
+    description: '+10% tiempo de misión y menor presión por eventos activos',
+    icon: '📚📚',
+    category: 'KNOWLEDGE',
+    cost: 95,
+    effect: () => {},
+    requires: ['knowledge_1'],
+    unlocked: false
+  },
+  {
+    id: 'efficiency_2',
+    name: 'Eficiencia Mejorada II',
+    description: 'Las acciones consumen 35% menos presupuesto',
+    icon: '⚙️⚙️',
+    category: 'EFFICIENCY',
+    cost: 90,
+    effect: () => {},
+    requires: ['efficiency_1'],
+    unlocked: false
+  },
+  {
+    id: 'special_logistics',
+    name: 'Logística de Gira',
+    description: '+20% recompensa en misiones y combos',
+    icon: '🚚',
+    category: 'SPECIAL',
+    cost: 140,
+    effect: () => {},
+    requires: ['efficiency_2', 'knowledge_2'],
+    unlocked: false
+  },
+  {
+    id: 'special_focus',
+    name: 'Modo Hiperfoco',
+    description: 'Menor estrés global y +25% tiempo de eventos',
+    icon: '🎯',
+    category: 'SPECIAL',
+    cost: 160,
+    effect: () => {},
+    requires: ['reflexes_2', 'resistance_2'],
     unlocked: false
   }
 ];

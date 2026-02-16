@@ -26,7 +26,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         {showValue && <span className={`${colorClass} font-bold text-glow`}>{Math.round(value)}%</span>}
       </div>
       
-      <div className="flex gap-[2px] h-3 w-full bg-slate-900/50 p-[2px] border border-slate-800 rounded-sm">
+      <div className="flex gap-[2px] h-3.5 w-full bg-slate-950/70 p-[2px] border border-slate-700/70 rounded-[6px] shadow-[inset_0_0_10px_rgba(2,6,23,0.8)]">
         {[...Array(segments)].map((_, i) => {
             const isActive = i < activeSegments;
             // Opacity gradient for active bars
@@ -35,10 +35,10 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
             return (
                 <div 
                     key={i}
-                    className={`flex-1 rounded-[1px] transition-all duration-150 ${isActive ? colorClass.replace('text-', 'bg-') : 'bg-slate-700'}`}
+                    className={`flex-1 rounded-[2px] transition-all duration-150 ${isActive ? colorClass.replace('text-', 'bg-') : 'bg-slate-700/70'}`}
                     style={{ 
                         opacity: opacity,
-                        boxShadow: isActive ? `0 0 4px ${colorClass === 'text-red-500' ? 'red' : 'currentColor'}` : 'none'
+                        boxShadow: isActive ? `0 0 6px ${colorClass === 'text-red-500' ? 'red' : 'currentColor'}` : 'none'
                     }}
                 />
             )

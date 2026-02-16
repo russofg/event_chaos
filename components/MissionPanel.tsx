@@ -5,9 +5,10 @@ import { AlertOctagon, Check, Clock, Radio, Zap } from 'lucide-react';
 
 interface MissionPanelProps {
   mission: ActiveMission;
+  mobile?: boolean;
 }
 
-export const MissionPanel: React.FC<MissionPanelProps> = ({ mission }) => {
+export const MissionPanel: React.FC<MissionPanelProps> = ({ mission, mobile = false }) => {
   const timeLeft = Math.max(0, Math.round((mission.expiresAt - Date.now()) / 1000));
   const progressPercent = Math.min(100, (mission.progress / mission.holdDuration) * 100);
   
@@ -15,8 +16,8 @@ export const MissionPanel: React.FC<MissionPanelProps> = ({ mission }) => {
   // We can infer this by progress speed but for UI simpler is to just show progress bar
 
   return (
-    <div className="absolute top-20 left-1/2 -translate-x-1/2 z-[95] animate-in slide-in-from-top duration-300">
-        <div className="bg-slate-900/90 border-2 border-amber-500 rounded-xl shadow-[0_0_30px_rgba(245,158,11,0.3)] p-4 w-96 overflow-hidden relative backdrop-blur-sm">
+    <div className={`${mobile ? 'relative w-full shrink-0 animate-in slide-in-from-top duration-300 pointer-events-none' : 'absolute top-20 left-1/2 -translate-x-1/2 z-[95] animate-in slide-in-from-top duration-300 w-[calc(100vw-1rem)] md:w-auto'}`}>
+        <div className={`bg-slate-900/90 border-2 border-amber-500 rounded-xl shadow-[0_0_30px_rgba(245,158,11,0.3)] ${mobile ? 'p-3 w-full' : 'p-4 w-full md:w-96'} overflow-hidden relative backdrop-blur-sm`}>
             
             {/* Background Stripe */}
             <div className="absolute top-0 left-0 w-2 h-full bg-amber-500 animate-pulse"></div>

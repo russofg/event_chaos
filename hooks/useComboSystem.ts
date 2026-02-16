@@ -16,19 +16,10 @@ export const useComboSystem = ({ systems, isPlaying }: UseComboSystemProps) => {
   
   const lastCheckRef = useRef<number>(Date.now());
   const bonusCallbackRef = useRef<((bonus: { type: string; amount: number; message: string }) => void) | null>(null);
+  const systemsRef = useRef(systems);
 
-  // Check if all systems are in safe zone (40-60%)
-  const areAllSystemsSafe = useCallback(() => {
-    return Object.values(systems).every(sys => 
-      sys.faderValue >= 40 && sys.faderValue <= 60
-    );
-  }, [systems]);
-
-  // Check if systems are in perfect sync (within 5% of each other)
-  const areSystemsInSync = useCallback(() => {
-    const values = Object.values(systems).map(s => s.faderValue);
-    const avg = values.reduce((a, b) => a + b, 0) / values.length;
-    return values.every(v => Math.abs(v - avg) < 5);
+  useEffect(() => {
+    systemsRef.current = systems;
   }, [systems]);
 
   // Update combo system
@@ -40,6 +31,7 @@ export const useComboSystem = ({ systems, isPlaying }: UseComboSystemProps) => {
         lastBonusTime: 0,
         perfectRhythm: false
       });
+      lastCheckRef.current = Date.now();
       return;
     }
 
@@ -47,11 +39,13 @@ export const useComboSystem = ({ systems, isPlaying }: UseComboSystemProps) => {
       const now = Date.now();
       const deltaTime = (now - lastCheckRef.current) / 1000; // seconds
       lastCheckRef.current = now;
+      const currentSystems = Object.values(systemsRef.current) as SystemState[];
+      const allSafe = currentSystems.every(sys => sys.faderValue >= 40 && sys.faderValue <= 60);
+      const values = currentSystems.map(s => s.faderValue);
+      const avg = values.reduce((a, b) => a + b, 0) / values.length;
+      const inSync = values.every(v => Math.abs(v - avg) < 5);
 
       setComboState(prev => {
-        const allSafe = areAllSystemsSafe();
-        const inSync = areSystemsInSync();
-        
         let newStreak = prev.streakSeconds;
         let newMultiplier = prev.multiplier;
         let newPerfectRhythm = inSync && allSafe;
@@ -117,7 +111,7 @@ export const useComboSystem = ({ systems, isPlaying }: UseComboSystemProps) => {
     }, 100); // Check every 100ms
 
     return () => clearInterval(interval);
-  }, [isPlaying, areAllSystemsSafe, areSystemsInSync]);
+  }, [isPlaying]);
 
   const setBonusCallback = useCallback((callback: (bonus: { type: string; amount: number; message: string }) => void) => {
     bonusCallbackRef.current = callback;

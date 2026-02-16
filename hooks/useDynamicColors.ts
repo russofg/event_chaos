@@ -11,13 +11,14 @@ interface DynamicColors {
   warning: string;
   // Background tints
   bgTint: string;
+  bgColor: string;
   borderTint: string;
   // Text colors
   textPrimary: string;
   textSecondary: string;
 }
 
-export const useDynamicColors = (stats: GameStats, systems: Record<SystemType, SystemState>) => {
+export const useDynamicColors = (stats: GameStats, _systems: Record<SystemType, SystemState>) => {
   return useMemo(() => {
     const { publicInterest, clientSatisfaction, stress } = stats;
     
@@ -41,6 +42,7 @@ export const useDynamicColors = (stats: GameStats, systems: Record<SystemType, S
         success: 'text-emerald-400',
         warning: 'text-orange-400',
         bgTint: 'bg-slate-950/50',
+        bgColor: '#020617',
         borderTint: 'border-slate-700',
         textPrimary: 'text-slate-300',
         textSecondary: 'text-slate-500'
@@ -55,6 +57,7 @@ export const useDynamicColors = (stats: GameStats, systems: Record<SystemType, S
         success: 'text-emerald-400',
         warning: 'text-yellow-500',
         bgTint: 'bg-amber-950/20',
+        bgColor: '#451a03',
         borderTint: 'border-amber-600',
         textPrimary: 'text-yellow-100',
         textSecondary: 'text-amber-300'
@@ -69,6 +72,7 @@ export const useDynamicColors = (stats: GameStats, systems: Record<SystemType, S
         success: 'text-emerald-500',
         warning: 'text-yellow-400',
         bgTint: 'bg-emerald-950/20',
+        bgColor: '#022c22',
         borderTint: 'border-emerald-600',
         textPrimary: 'text-emerald-100',
         textSecondary: 'text-emerald-300'
@@ -83,6 +87,7 @@ export const useDynamicColors = (stats: GameStats, systems: Record<SystemType, S
         success: 'text-emerald-400',
         warning: 'text-amber-400',
         bgTint: 'bg-slate-900/50',
+        bgColor: '#0f172a',
         borderTint: 'border-slate-600',
         textPrimary: 'text-slate-100',
         textSecondary: 'text-slate-400'
@@ -90,5 +95,5 @@ export const useDynamicColors = (stats: GameStats, systems: Record<SystemType, S
     }
     
     return colors;
-  }, [stats, systems]);
+  }, [stats]);
 };

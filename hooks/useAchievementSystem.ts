@@ -10,6 +10,10 @@ interface UseAchievementSystemProps {
   onAchievementUnlocked: (achievementId: string, points: number) => void;
 }
 
+export const shouldRunFinalAchievementCheck = (wasPlaying: boolean, isPlaying: boolean) => {
+  return wasPlaying && !isPlaying;
+};
+
 // Definición de logros
 export const ACHIEVEMENTS: Achievement[] = [
   {
@@ -121,8 +125,43 @@ export const useAchievementSystem = ({
   });
 
   const sessionStartTime = useRef<number>(0);
-  const lastCheckTime = useRef<number>(0);
   const perfectStreakStart = useRef<number | null>(null);
+  const wasPlayingRef = useRef<boolean>(false);
+  const statsRef = useRef(stats);
+  const systemsRef = useRef(systems);
+  const activeEventsRef = useRef(activeEvents);
+  const sessionDataRef = useRef(sessionData);
+  const careerDataRef = useRef(careerData);
+  const onAchievementUnlockedRef = useRef(onAchievementUnlocked);
+  const isPlayingRef = useRef(isPlaying);
+
+  useEffect(() => {
+    statsRef.current = stats;
+  }, [stats]);
+
+  useEffect(() => {
+    systemsRef.current = systems;
+  }, [systems]);
+
+  useEffect(() => {
+    activeEventsRef.current = activeEvents;
+  }, [activeEvents]);
+
+  useEffect(() => {
+    sessionDataRef.current = sessionData;
+  }, [sessionData]);
+
+  useEffect(() => {
+    careerDataRef.current = careerData;
+  }, [careerData]);
+
+  useEffect(() => {
+    onAchievementUnlockedRef.current = onAchievementUnlocked;
+  }, [onAchievementUnlocked]);
+
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
 
   // Reset session data when game starts
   useEffect(() => {
@@ -184,21 +223,21 @@ export const useAchievementSystem = ({
   }, [stats, systems, isPlaying]);
 
   // Check achievements
-  const checkAchievements = useCallback(() => {
-    if (!isPlaying) return;
+  const checkAchievements = useCallback((force: boolean = false) => {
+    if (!force && !isPlayingRef.current) return;
 
     ACHIEVEMENTS.forEach(achievement => {
       // Skip if already unlocked
-      if (careerData.unlockedAchievements.includes(achievement.id)) {
+      if (careerDataRef.current.unlockedAchievements.includes(achievement.id)) {
         return;
       }
 
       // Check condition
-      if (achievement.checkCondition(stats, systems, activeEvents, sessionData)) {
-        onAchievementUnlocked(achievement.id, achievement.rewardPoints);
+      if (achievement.checkCondition(statsRef.current, systemsRef.current, activeEventsRef.current, sessionDataRef.current)) {
+        onAchievementUnlockedRef.current(achievement.id, achievement.rewardPoints);
       }
     });
-  }, [stats, systems, activeEvents, sessionData, isPlaying, careerData, onAchievementUnlocked]);
+  }, []);
 
   // Check achievements periodically
   useEffect(() => {
@@ -207,6 +246,14 @@ export const useAchievementSystem = ({
     const interval = setInterval(checkAchievements, 2000);
     return () => clearInterval(interval);
   }, [checkAchievements, isPlaying]);
+
+  // Run a final achievement check when the session ends (e.g. VICTORY).
+  useEffect(() => {
+    if (shouldRunFinalAchievementCheck(wasPlayingRef.current, isPlaying)) {
+      checkAchievements(true);
+    }
+    wasPlayingRef.current = isPlaying;
+  }, [isPlaying, checkAchievements]);
 
   // Track events resolved/failed
   const trackEventResolved = useCallback((success: boolean) => {

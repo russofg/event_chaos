@@ -1,7 +1,9 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { SystemType, SystemState } from '../types';
-import { AlertCircle, Disc, Zap } from 'lucide-react';
+import { Disc } from 'lucide-react';
+import { getFrameIntervalMs, getVisualizerTargetFps } from '../utils/visualPerformance';
+import type { VisualQualityMode } from '../utils/visualPerformance';
 
 interface VisualizerProps {
   systemType: SystemType;
@@ -11,27 +13,41 @@ interface VisualizerProps {
   isAiGenerating?: boolean;
   allSystems?: Record<SystemType, SystemState>;
   publicInterest: number; // Added for crowd logic
+  stressLevel?: number;
+  isMobile?: boolean;
+  qualityMode?: VisualQualityMode;
+  reducedMotionOverride?: boolean;
 }
 
 export const Visualizer: React.FC<VisualizerProps> = ({ 
   systemType, 
   status, 
   allSystems,
-  publicInterest
+  publicInterest,
+  stressLevel = 0,
+  isMobile = false,
+  qualityMode = 'AUTO' as VisualQualityMode,
+  reducedMotionOverride = false
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [tick, setTick] = useState(0);
+  const lastRenderTimeRef = useRef(0);
 
   // Animation Loop
   useEffect(() => {
     let animationFrameId: number;
-    const animate = () => {
-        setTick(t => t + 1);
+    const animate = (timestamp: number) => {
+        const targetFps = getVisualizerTargetFps(isMobile, stressLevel, qualityMode, reducedMotionOverride);
+        const minDelta = getFrameIntervalMs(targetFps);
+        if (timestamp - lastRenderTimeRef.current >= minDelta) {
+          lastRenderTimeRef.current = timestamp;
+          setTick(t => t + 1);
+        }
         animationFrameId = requestAnimationFrame(animate);
     }
-    animate();
+    animationFrameId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationFrameId);
-  }, []);
+  }, [isMobile, qualityMode, reducedMotionOverride, stressLevel]);
 
   // --- RENDER FUNCTIONS ---
   useEffect(() => {

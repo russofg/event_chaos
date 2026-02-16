@@ -1,20 +1,17 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Event Chaos: Live Production Simulator
 
-# Run and deploy your AI Studio app
+Web game (desktop + mobile) built with React + Vite.
 
-This contains everything you need to run your app locally.
+## Local Run
 
-View your app in AI Studio: https://ai.studio/apps/drive/1js8pwMhPM-Mwzf8UYt0laFY0IdKsGY4_
+Prerequisite: Node.js 18+.
 
-## Run Locally
+1. Install dependencies: `npm install`
+2. Start dev server: `npm run dev`
+3. Build production: `npm run build`
+4. Run tests: `npm run test`
 
-**Prerequisites:**  Node.js
+## AI/API Note
 
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+The game runs fully offline-first and does not require any external AI API key to work.
+If an API key exists in env vars, it is treated as optional runtime metadata only.

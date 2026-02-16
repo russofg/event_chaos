@@ -8,6 +8,12 @@ export const useClientAI = (stats: GameStats, isPlaying: boolean) => {
   const [clientMood, setClientMood] = useState<'HAPPY' | 'ANGRY' | 'PANIC' | 'NEUTRAL'>('NEUTRAL');
   const lastSpokeTime = useRef<number>(Date.now());
   const processingRef = useRef(false);
+  const statsRef = useRef(stats);
+  const pendingTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    statsRef.current = stats;
+  }, [stats]);
 
   // Helper to pick random array element
   const pickRandom = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
@@ -19,7 +25,7 @@ export const useClientAI = (stats: GameStats, isPlaying: boolean) => {
       processingRef.current = true;
       
       // Simulate "thinking" delay briefly
-      setTimeout(() => {
+      pendingTimeoutRef.current = window.setTimeout(() => {
           const text = pickRandom(CLIENT_MESSAGES[mood]);
           setClientMood(mood);
           setClientMessage(text);
@@ -31,26 +37,32 @@ export const useClientAI = (stats: GameStats, isPlaying: boolean) => {
   useEffect(() => {
     if (!isPlaying) {
         setClientMessage(null);
+        if (pendingTimeoutRef.current) {
+          clearTimeout(pendingTimeoutRef.current);
+          pendingTimeoutRef.current = null;
+        }
+        processingRef.current = false;
         return;
     }
 
     const checkInterval = setInterval(() => {
       const now = Date.now();
+      const currentStats = statsRef.current;
       // Don't speak too often (min 12 seconds cooldown)
       if (now - lastSpokeTime.current < 12000) return;
 
       const randomTrigger = Math.random();
 
       // Priority 1: High Stress / Low Satisfaction (Panic/Angry)
-      if (stats.stress > 80 || stats.clientSatisfaction < 20) {
+      if (currentStats.stress > 80 || currentStats.clientSatisfaction < 20) {
          if (randomTrigger > 0.3) { 
-             generateMessage(stats.stress > 90 ? 'PANIC' : 'ANGRY');
+             generateMessage(currentStats.stress > 90 ? 'PANIC' : 'ANGRY');
          }
          return;
       }
 
       // Priority 2: Public is bored
-      if (stats.publicInterest < 30) {
+      if (currentStats.publicInterest < 30) {
           if (randomTrigger > 0.5) {
               generateMessage('ANGRY');
           }
@@ -58,7 +70,7 @@ export const useClientAI = (stats: GameStats, isPlaying: boolean) => {
       }
 
       // Priority 3: Going well (Happy)
-      if (stats.publicInterest > 70 && stats.clientSatisfaction > 70 && stats.stress < 40) {
+      if (currentStats.publicInterest > 70 && currentStats.clientSatisfaction > 70 && currentStats.stress < 40) {
           if (randomTrigger > 0.6) { 
               generateMessage('HAPPY');
           }
@@ -72,8 +84,15 @@ export const useClientAI = (stats: GameStats, isPlaying: boolean) => {
 
     }, 2000); // Check conditions every 2s
 
-    return () => clearInterval(checkInterval);
-  }, [stats, isPlaying]);
+    return () => {
+      clearInterval(checkInterval);
+      if (pendingTimeoutRef.current) {
+        clearTimeout(pendingTimeoutRef.current);
+        pendingTimeoutRef.current = null;
+      }
+      processingRef.current = false;
+    };
+  }, [isPlaying]);
 
   const clearMessage = () => setClientMessage(null);
 

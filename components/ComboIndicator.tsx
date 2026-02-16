@@ -4,9 +4,10 @@ import { Zap, Music, TrendingUp } from 'lucide-react';
 
 interface ComboIndicatorProps {
   comboState: ComboState;
+  mobile?: boolean;
 }
 
-export const ComboIndicator: React.FC<ComboIndicatorProps> = ({ comboState }) => {
+export const ComboIndicator: React.FC<ComboIndicatorProps> = ({ comboState, mobile = false }) => {
   const { streakSeconds, multiplier, perfectRhythm } = comboState;
   
   if (multiplier <= 1.0 && !perfectRhythm) return null;
@@ -26,8 +27,8 @@ export const ComboIndicator: React.FC<ComboIndicatorProps> = ({ comboState }) =>
   };
 
   return (
-    <div className="absolute top-20 right-8 z-[85] animate-in slide-in-from-top duration-300">
-      <div className={`bg-slate-900/95 border-2 ${perfectRhythm ? 'border-yellow-500' : 'border-cyan-500'} rounded-xl shadow-2xl p-4 backdrop-blur-sm ${getMultiplierGlow()}`}>
+    <div className={`${mobile ? 'relative w-full shrink-0 animate-in slide-in-from-top duration-300 pointer-events-none' : 'absolute top-20 left-2 right-2 md:left-auto md:right-8 z-[85] animate-in slide-in-from-top duration-300'}`}>
+      <div className={`bg-slate-900/95 border-2 ${perfectRhythm ? 'border-yellow-500' : 'border-cyan-500'} rounded-xl shadow-2xl ${mobile ? 'p-3' : 'p-4'} backdrop-blur-sm ${getMultiplierGlow()}`}>
         <div className="flex items-center gap-3">
           {perfectRhythm ? (
             <>

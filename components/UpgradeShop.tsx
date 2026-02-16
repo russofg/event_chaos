@@ -1,9 +1,10 @@
 import React from 'react';
 import { PermanentUpgrade } from '../types';
-import { Zap, Shield, Book, Settings, Lock, Check } from 'lucide-react';
+import { Zap, Shield, Book, Settings, Check } from 'lucide-react';
+import type { AvailableUpgrade } from '../hooks/useUpgradeSystem';
 
 interface UpgradeShopProps {
-  upgrades: (PermanentUpgrade & { unlocked: boolean; canAfford: boolean })[];
+  upgrades: AvailableUpgrade[];
   careerPoints: number;
   onPurchase: (upgrade: PermanentUpgrade) => void;
   onClose: () => void;
@@ -48,7 +49,7 @@ export const UpgradeShop: React.FC<UpgradeShopProps> = ({ upgrades, careerPoints
               className={`p-4 rounded-lg border-2 transition-all ${
                 upgrade.unlocked
                   ? 'border-green-500 bg-green-950/20'
-                  : upgrade.canAfford
+                  : upgrade.canPurchase
                   ? 'border-cyan-500 bg-cyan-950/20 hover:border-cyan-400'
                   : 'border-slate-700 bg-slate-800/50 opacity-60'
               }`}
@@ -64,18 +65,21 @@ export const UpgradeShop: React.FC<UpgradeShopProps> = ({ upgrades, careerPoints
                     {upgrade.unlocked && <Check className="w-4 h-4 text-green-500" />}
                   </div>
                   <p className="text-sm text-slate-300 mb-2">{upgrade.description}</p>
+                  {!upgrade.unlocked && upgrade.lockReason && (
+                    <p className="text-xs text-amber-400 mb-2">{upgrade.lockReason}</p>
+                  )}
                   <div className="flex items-center justify-between">
                     {!upgrade.unlocked ? (
                       <button
                         onClick={() => onPurchase(upgrade)}
-                        disabled={!upgrade.canAfford}
+                        disabled={!upgrade.canPurchase}
                         className={`px-4 py-2 rounded font-bold text-sm transition-all ${
-                          upgrade.canAfford
+                          upgrade.canPurchase
                             ? 'bg-cyan-600 hover:bg-cyan-500 text-white'
                             : 'bg-slate-700 text-slate-500 cursor-not-allowed'
                         }`}
                       >
-                        {upgrade.canAfford ? `Comprar (${upgrade.cost} pts)` : `Necesitas ${upgrade.cost} pts`}
+                        {upgrade.canPurchase ? `Comprar (${upgrade.cost} pts)` : 'Bloqueado'}
                       </button>
                     ) : (
                       <div className="flex items-center gap-2 text-green-400 text-sm">

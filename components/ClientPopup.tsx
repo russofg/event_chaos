@@ -5,9 +5,10 @@ interface ClientPopupProps {
   message: string | null;
   mood: 'HAPPY' | 'ANGRY' | 'PANIC' | 'NEUTRAL';
   onClose: () => void;
+  mobile?: boolean;
 }
 
-export const ClientPopup: React.FC<ClientPopupProps> = ({ message, mood, onClose }) => {
+export const ClientPopup: React.FC<ClientPopupProps> = ({ message, mood, onClose, mobile = false }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -43,7 +44,7 @@ export const ClientPopup: React.FC<ClientPopupProps> = ({ message, mood, onClose
   };
 
   return (
-    <div className={`absolute top-24 right-8 z-50 w-80 transition-all duration-500 transform ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-20 opacity-0'}`}>
+    <div className={`${mobile ? 'relative w-full shrink-0 pointer-events-auto' : 'absolute top-20 md:top-24 left-2 right-2 md:left-auto md:right-8 z-50 md:w-80'} transition-all duration-500 transform ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-20 opacity-0'}`}>
       <div className={`border-l-4 p-4 rounded-r-lg shadow-2xl backdrop-blur-md relative overflow-hidden ${getStyles()}`}>
         
         {/* Scanlines overlay specific to popup */}

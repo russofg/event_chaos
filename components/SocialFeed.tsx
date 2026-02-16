@@ -4,6 +4,7 @@ import { GameStats } from '../types';
 
 interface SocialFeedProps {
   stats: GameStats;
+  mobile?: boolean;
 }
 
 interface Post {
@@ -13,8 +14,13 @@ interface Post {
   type: 'GOOD' | 'BAD' | 'NEUTRAL';
 }
 
-export const SocialFeed: React.FC<SocialFeedProps> = ({ stats }) => {
+export const SocialFeed: React.FC<SocialFeedProps> = ({ stats, mobile = false }) => {
   const [posts, setPosts] = useState<Post[]>([]);
+  const statsRef = React.useRef(stats);
+
+  useEffect(() => {
+    statsRef.current = stats;
+  }, [stats]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -24,14 +30,15 @@ export const SocialFeed: React.FC<SocialFeedProps> = ({ stats }) => {
       }
     }, 3000);
     return () => clearInterval(interval);
-  }, [stats]);
+  }, []);
 
   const addPost = () => {
     let type: 'GOOD' | 'BAD' | 'NEUTRAL' = 'NEUTRAL';
     let text = "";
     
     // Logic for generating "fake" tweets based on game state
-    if (stats.publicInterest < 30 || stats.stress > 80) {
+    const currentStats = statsRef.current;
+    if (currentStats.publicInterest < 30 || currentStats.stress > 80) {
         type = 'BAD';
         const badTexts = [
             "Esto es un desastre #refund",
@@ -43,7 +50,7 @@ export const SocialFeed: React.FC<SocialFeedProps> = ({ stats }) => {
             "Me quiero ir a casa."
         ];
         text = badTexts[Math.floor(Math.random() * badTexts.length)];
-    } else if (stats.publicInterest > 75) {
+    } else if (currentStats.publicInterest > 75) {
         type = 'GOOD';
         const goodTexts = [
             "¡Increíble show! 🔥",
@@ -73,11 +80,11 @@ export const SocialFeed: React.FC<SocialFeedProps> = ({ stats }) => {
         type
     };
 
-    setPosts(prev => [newPost, ...prev].slice(0, 4)); // Keep last 4
+    setPosts(prev => [newPost, ...prev].slice(0, mobile ? 2 : 4));
   };
 
   return (
-    <div className="absolute bottom-4 right-4 w-72 z-30 pointer-events-none">
+    <div className={`${mobile ? 'relative w-full shrink-0 pointer-events-none' : 'absolute bottom-2 md:bottom-4 left-2 right-2 md:left-auto md:right-4 md:w-72 z-30 pointer-events-none'}`}>
        <div className="bg-black/40 backdrop-blur-md border border-slate-700 rounded-lg p-3 overflow-hidden">
            <div className="flex items-center gap-2 text-[10px] font-bold text-cyan-400 uppercase mb-2 border-b border-white/10 pb-1">
                <Hash className="w-3 h-3" /> Tendencias en Vivo
