@@ -1,0 +1,29 @@
+<svg width="220" height="260" viewBox="0 0 220 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Moving head light fixture">
+  <defs>
+    <linearGradient id="base" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#415170"/>
+      <stop offset="0.55" stop-color="#1e2738"/>
+      <stop offset="1" stop-color="#0c121d"/>
+    </linearGradient>
+    <linearGradient id="head" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#556786"/>
+      <stop offset="0.5" stop-color="#283246"/>
+      <stop offset="1" stop-color="#111824"/>
+    </linearGradient>
+    <radialGradient id="lens" cx="50%" cy="45%" r="50%">
+      <stop offset="0" stop-color="#dff7ff" stop-opacity="0.95"/>
+      <stop offset="0.35" stop-color="#8ed8ff" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#1f3c68" stop-opacity="0.88"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="56" y="186" width="108" height="44" rx="10" fill="url(#base)" stroke="#90a7cf" stroke-opacity="0.45"/>
+  <rect x="78" y="172" width="64" height="16" rx="7" fill="#121a28" stroke="#839bc3" stroke-opacity="0.35"/>
+
+  <path d="M72 170L92 92H128L148 170H72Z" fill="#1a2333" stroke="#7f95bd" stroke-opacity="0.4"/>
+  <rect x="84" y="84" width="52" height="18" rx="7" fill="#101928" stroke="#7f95bd" stroke-opacity="0.45"/>
+
+  <rect x="66" y="44" width="88" height="56" rx="13" fill="url(#head)" stroke="#9cb2d8" stroke-opacity="0.55"/>
+  <circle cx="110" cy="72" r="22" fill="url(#lens)" stroke="#d3eeff" stroke-opacity="0.75"/>
+  <circle cx="110" cy="72" r="7" fill="#f5fcff" fill-opacity="0.75"/>
+</svg>

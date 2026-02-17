@@ -100,18 +100,19 @@ describe('Mobile UI Policy Regressions', () => {
     expect(visibility.showSocialFeed).toBe(false);
   });
 
-  it('prioritizes event lane over mission/warnings/narrative to prevent stacked overlaps', () => {
+  it('keeps event lane as primary and still surfaces warnings when there is room', () => {
     const visibility = getMobileOverlayVisibility({
       hasActiveMission: true,
       hasActiveNarrative: true,
       warningCount: 2,
       hasPrimaryEvent: true,
-      hasClientMessage: true
+      hasClientMessage: true,
+      centerHeight: 430
     });
 
     expect(visibility.primaryOverlay).toBe('EVENT');
     expect(visibility.showPrimaryEvent).toBe(true);
-    expect(visibility.showWarnings).toBe(false);
+    expect(visibility.showWarnings).toBe(true);
     expect(visibility.showNarrative).toBe(false);
     expect(visibility.showMission).toBe(false);
     expect(visibility.showClientPopup).toBe(false);
@@ -128,6 +129,21 @@ describe('Mobile UI Policy Regressions', () => {
     });
 
     expect(compact.showWarnings).toBe(true);
+    expect(compact.maxVisibleWarningCards).toBe(2);
+  });
+
+  it('hides warning lane on ultra compact viewports when a primary event is active', () => {
+    const compact = getMobileOverlayVisibility({
+      hasActiveMission: false,
+      hasActiveNarrative: false,
+      warningCount: 3,
+      hasPrimaryEvent: true,
+      hasClientMessage: false,
+      centerHeight: 280
+    });
+
+    expect(compact.showPrimaryEvent).toBe(true);
+    expect(compact.showWarnings).toBe(false);
     expect(compact.maxVisibleWarningCards).toBe(1);
   });
 
@@ -138,7 +154,7 @@ describe('Mobile UI Policy Regressions', () => {
 
     expect(mobile.container.includes('top-')).toBe(true);
     expect(mobile.menuPanelOffset.includes('mt-24')).toBe(true);
-    expect(desktop.container.includes('bottom-4')).toBe(true);
+    expect(desktop.container.includes('top-4')).toBe(true);
     expect(desktop.menuPanelOffset).toBe('mt-0');
     expect(compactDesktop.container.includes('top-3')).toBe(true);
     expect(compactDesktop.menuPanelOffset).toBe('mt-24');

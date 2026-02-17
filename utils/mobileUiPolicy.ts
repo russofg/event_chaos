@@ -52,15 +52,24 @@ export const getMobileOverlayVisibility = ({
   isCompactViewport = false,
   centerHeight
 }: MobileOverlayVisibilityInput): MobileOverlayVisibility => {
-  const compactByHeight = Number.isFinite(centerHeight) ? (centerHeight as number) < 340 : false;
+  const normalizedCenterHeight = Number.isFinite(centerHeight)
+    ? Math.max(0, centerHeight as number)
+    : undefined;
+  const compactByHeight = typeof normalizedCenterHeight === 'number'
+    ? normalizedCenterHeight < 360
+    : false;
+  const ultraCompactByHeight = typeof normalizedCenterHeight === 'number'
+    ? normalizedCenterHeight < 300
+    : false;
   const isCompact = isCompactViewport || compactByHeight;
+  const isUltraCompact = isCompactViewport && compactByHeight ? true : ultraCompactByHeight;
 
   const showPrimaryEvent = hasPrimaryEvent;
-  const showWarnings = !showPrimaryEvent && warningCount > 0;
-  const showNarrative = !showPrimaryEvent && !showWarnings && hasActiveNarrative;
-  const showMission = !showPrimaryEvent && !showWarnings && !showNarrative && hasActiveMission;
-
+  const showWarnings = warningCount > 0 && (!showPrimaryEvent || !isUltraCompact);
+  const showNarrative = hasActiveNarrative && !showPrimaryEvent && (!showWarnings || !isCompact);
+  const showMission = hasActiveMission && !showPrimaryEvent && !showWarnings && (!showNarrative || !isCompact);
   const hasBlockingOverlay = showMission || showPrimaryEvent || showWarnings || showNarrative;
+
   const primaryOverlay: MobileOverlayVisibility['primaryOverlay'] = showPrimaryEvent
     ? 'EVENT'
     : showWarnings
@@ -71,6 +80,19 @@ export const getMobileOverlayVisibility = ({
           ? 'MISSION'
           : 'NONE';
 
+  const allowSecondaryPanels = !isCompact;
+  const showClientPopup =
+    hasClientMessage &&
+    !showPrimaryEvent &&
+    !showNarrative &&
+    (!showWarnings || allowSecondaryPanels);
+  const showCombo =
+    !showPrimaryEvent &&
+    !showWarnings &&
+    !showNarrative &&
+    (!hasClientMessage || allowSecondaryPanels);
+  const showSocialFeed = !showPrimaryEvent && !showWarnings && !showNarrative && !hasClientMessage && !showMission;
+
   return {
     primaryOverlay,
     hasBlockingOverlay,
@@ -78,10 +100,10 @@ export const getMobileOverlayVisibility = ({
     showPrimaryEvent,
     showWarnings,
     showNarrative,
-    maxVisibleWarningCards: isCompact ? 1 : 2,
-    showClientPopup: hasClientMessage && !hasBlockingOverlay,
-    showCombo: !hasBlockingOverlay,
-    showSocialFeed: !hasBlockingOverlay && !hasClientMessage
+    maxVisibleWarningCards: isUltraCompact ? 1 : isCompact ? 2 : 3,
+    showClientPopup,
+    showCombo,
+    showSocialFeed
   };
 };
 
@@ -117,7 +139,7 @@ export const getMenuToolbarClasses = (
   }
 
   return {
-    container: 'absolute bottom-4 left-4 right-4 md:bottom-8 md:left-8 md:right-auto flex flex-wrap gap-3 z-50',
+    container: 'absolute top-4 left-4 right-4 md:right-auto flex flex-wrap gap-3 z-50',
     button: 'aaa-toolbar-btn px-4 py-2 text-white flex items-center gap-2',
     icon: 'w-5 h-5',
     menuPanelOffset: 'mt-0'

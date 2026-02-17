@@ -39,7 +39,10 @@ import { getCinematicTransitionStyle, getThreatLevel, getThreatRailProfile } fro
 import { getEventImpactStyle } from './utils/impactFx';
 import type { EventImpactStyle } from './utils/impactFx';
 import { buildRuntimeDiagnosticsSnapshot } from './utils/runtimeDiagnostics';
+import { getArtDirectionCssVariables, getScenarioArtDirectionProfile } from './utils/artDirection';
+import { getFxTextureCssVariables, getSceneBackgroundAsset } from './utils/artAssets';
 import { getMenuToolbarClasses, getMobileOverlayVisibility, sortEventsByUrgency } from './utils/mobileUiPolicy';
+import { getHudCinematicClasses } from './utils/uiCinematics';
 import { Activity, DollarSign, Trophy, AlertOctagon, Users, ZapOff, Frown, Pause, RotateCcw, AlertTriangle, Settings, Home } from 'lucide-react';
 
 const VISUAL_QUALITY_STORAGE_KEY = 'event_chaos_visual_quality_mode';
@@ -606,6 +609,10 @@ const App: React.FC = () => {
     () => getThreatRailProfile(threatLevel, gameState === GameState.PAUSED),
     [gameState, threatLevel]
   );
+  const hudCinematicClasses = useMemo(
+    () => getHudCinematicClasses(threatRailProfile.tone, reducedMotion, isMobileLayout),
+    [isMobileLayout, reducedMotion, threatRailProfile.tone]
+  );
 
   useEffect(() => {
     setAdaptiveAudioMix({
@@ -806,6 +813,55 @@ const App: React.FC = () => {
 
   // Fase 4: Paleta de colores dinámica
   const dynamicColors = useDynamicColors(stats, systems);
+  const artDirectionScenarioId = gameState === GameState.MENU ? selectedScenarioId : currentScenario.id;
+  const artDirectionMode = gameState === GameState.MENU ? selectedGameMode : currentGameMode;
+  const artDirectionProfile = useMemo(
+    () => getScenarioArtDirectionProfile(artDirectionScenarioId),
+    [artDirectionScenarioId]
+  );
+  const artDirectionCssVariables = useMemo(
+    () =>
+      getArtDirectionCssVariables({
+        scenarioId: artDirectionScenarioId,
+        mode: artDirectionMode,
+        threatLevel,
+        gameState,
+        reducedMotion
+      }),
+    [artDirectionMode, artDirectionScenarioId, gameState, reducedMotion, threatLevel]
+  );
+  const shellStyle = useMemo(
+    () => {
+      const sceneImage = getSceneBackgroundAsset(gameState, isMobileLayout);
+      const sceneImageOpacity =
+        gameState === GameState.MENU
+          ? 0.72
+          : gameState === GameState.PLAYING || gameState === GameState.PAUSED
+            ? 0.44
+            : 0.36;
+
+      return {
+        ...artDirectionCssVariables,
+        ...getFxTextureCssVariables(),
+        ['--aaa-scene-image' as string]: `url('${sceneImage}')`,
+        ['--aaa-scene-image-opacity' as string]: `${sceneImageOpacity}`,
+        background: gameState === GameState.PLAYING
+          ? `linear-gradient(160deg, ${artDirectionProfile.shell.from} 0%, ${dynamicColors.bgColor} 52%, ${artDirectionProfile.shell.to} 100%)`
+          : `linear-gradient(160deg, ${artDirectionProfile.shell.from}, ${artDirectionProfile.shell.mid} 56%, ${artDirectionProfile.shell.to})`,
+        filter: highContrastUi ? 'contrast(1.12) saturate(1.08)' : undefined
+      } as React.CSSProperties;
+    },
+    [
+      artDirectionCssVariables,
+      artDirectionProfile.shell.from,
+      artDirectionProfile.shell.mid,
+      artDirectionProfile.shell.to,
+      dynamicColors.bgColor,
+      gameState,
+      highContrastUi,
+      isMobileLayout
+    ]
+  );
   const transitionTintClass: Record<ActiveCinematicTransition['tint'], string> = {
     CYAN: 'from-cyan-400/35 via-sky-400/20 to-transparent',
     AMBER: 'from-amber-400/35 via-orange-400/20 to-transparent',
@@ -828,19 +884,15 @@ const App: React.FC = () => {
 
   return (
     <div 
-        className={`aaa-shell h-screen w-screen text-slate-100 flex flex-col overflow-hidden relative selection:bg-cyan-500 selection:text-black font-sans
+        className={`aaa-shell h-screen w-screen text-slate-100 flex flex-col overflow-hidden relative selection:bg-cyan-500 selection:text-black
             ${screenShake ? 'animate-shake' : ''}
+            ${hudCinematicClasses.shellToneClass}
             transition-colors duration-1000
         `}
-        style={{
-          // Aplicar tint dinámico al fondo
-          background: gameState === GameState.PLAYING 
-            ? `linear-gradient(160deg, #050a16 0%, ${dynamicColors.bgColor} 52%, #08162d 100%)`
-            : 'linear-gradient(160deg, #040814, #09172a 56%, #10243d)',
-          filter: highContrastUi ? 'contrast(1.12) saturate(1.08)' : undefined
-        }}
+        style={shellStyle}
     >
       {/* --- ATMOSPHERE LAYERS --- */}
+      <div className="aaa-bg-scene"></div>
       <div className="aaa-bg-aurora"></div>
       <div className="aaa-bg-grid"></div>
       <div className="aaa-bg-noise"></div>
@@ -946,6 +998,9 @@ const App: React.FC = () => {
             scenarios={SCENARIOS} 
             careerData={careerData}
             menuPanelOffsetClass={menuToolbarClasses.menuPanelOffset}
+            isCompactLayout={isCompactViewport}
+            isMobileLayout={isMobileLayout}
+            reducedMotion={reducedMotion}
          />
          {/* Fase 3: Botones de Logros y Mejoras */}
          <div className={menuToolbarClasses.container}>
@@ -1031,6 +1086,9 @@ const App: React.FC = () => {
             handleStartSession(restartScenario, restartCrew, restartMode);
           }}
           onQuit={() => { playClick(); quitGame(); }}
+          isCompactLayout={isCompactViewport}
+          isMobileLayout={isMobileLayout}
+          reducedMotion={reducedMotion}
         />
       )}
 
@@ -1071,7 +1129,7 @@ const App: React.FC = () => {
 
             {isMobileLayout && (
               <div
-                className="absolute left-2 right-2 z-[95] flex flex-col items-stretch gap-2 pointer-events-none overflow-y-auto overscroll-contain pb-2 pr-1"
+                className={`absolute left-2 right-2 z-[95] flex flex-col items-stretch gap-2 pointer-events-none overflow-y-auto overscroll-contain pb-2 pr-1 ${hudCinematicClasses.mobileOverlayClass}`}
                 style={{ top: mobileHudInsets.top, bottom: mobileHudInsets.bottom }}
               >
                 {showMobileMission && activeMission && <MissionPanel mission={activeMission} mobile />}
@@ -1129,7 +1187,7 @@ const App: React.FC = () => {
             )}
 
             {/* HEADER */}
-            <header ref={headerRef} className="min-h-20 aaa-panel aaa-panel-soft rounded-none md:rounded-xl flex items-center px-2 md:px-4 gap-2 md:gap-4 relative z-30">
+            <header ref={headerRef} className={`min-h-20 aaa-panel aaa-panel-soft rounded-none md:rounded-xl flex items-center px-2 md:px-4 gap-2 md:gap-4 relative z-30 ${hudCinematicClasses.headerClass}`}>
                 <div className="absolute top-0 left-0 w-full h-[1px] bg-white/15"></div>
                 
                 {/* Clock LCD */}
@@ -1190,7 +1248,7 @@ const App: React.FC = () => {
                     
                     {/* CENTER: 2D Visualizer */}
                     <main className="flex-1 flex flex-col gap-2 md:gap-4 relative z-20 min-w-0">
-                        <div className="flex-1 min-h-[220px] aaa-panel aaa-panel-strong overflow-hidden relative">
+                        <div className={`flex-1 min-h-[220px] aaa-panel aaa-panel-strong overflow-hidden relative ${hudCinematicClasses.stagePanelClass}`}>
                              <Visualizer 
                                 systemType={selectedSystem} 
                                 status={systems[selectedSystem].status} 
@@ -1201,17 +1259,18 @@ const App: React.FC = () => {
                                 isMobile={isMobileLayout}
                                 qualityMode={visualQualityMode}
                                 reducedMotionOverride={reducedMotion}
+                                scenarioId={currentScenario.id}
                             />
                         </div>
 
-                        <div className="h-24 md:h-32">
+                        <div className={`h-24 md:h-32 ${hudCinematicClasses.terminalClass}`}>
                             <TerminalLog logs={logs} />
                         </div>
                     </main>
 
                     {/* RIGHT: Alerts */}
                     {!isMobileLayout && (
-                    <aside className="w-full lg:w-80 max-h-64 lg:max-h-none flex flex-col gap-3 md:gap-4 z-20 aaa-panel aaa-panel-soft p-3 md:p-4">
+                    <aside className={`w-full lg:w-80 max-h-64 lg:max-h-none flex flex-col gap-3 md:gap-4 z-20 aaa-panel aaa-panel-soft p-3 md:p-4 ${hudCinematicClasses.eventLogClass}`}>
                         <div className="flex justify-between items-center pb-2 border-b border-slate-700/80">
                             <span className="text-xs font-bold text-slate-300 uppercase tracking-widest flex items-center gap-2">
                                 <AlertTriangle className="w-4 h-4 text-amber-500" /> EVENT LOG
@@ -1237,7 +1296,7 @@ const App: React.FC = () => {
                     )}
                 </div>
 
-                <div ref={mobileFaderDockRef} className="z-40">
+                <div ref={mobileFaderDockRef} className={`z-40 ${hudCinematicClasses.faderDockClass}`}>
                     <FaderPanel 
                         systems={systems} 
                         onFaderChange={handleFaderChange} 

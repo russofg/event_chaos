@@ -48,7 +48,7 @@ export const ClientPopup: React.FC<ClientPopupProps> = ({ message, mood, onClose
       <div className={`border-l-4 p-4 rounded-r-lg shadow-2xl backdrop-blur-md relative overflow-hidden ${getStyles()}`}>
         
         {/* Scanlines overlay specific to popup */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.2)_50%)] bg-[length:100%_4px] pointer-events-none"></div>
+        <div className="absolute inset-0 aaa-scanline-overlay pointer-events-none"></div>
 
         <div className="flex items-start gap-4 relative z-10">
            {/* Client Avatar Placeholder */}

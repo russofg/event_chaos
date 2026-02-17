@@ -1,0 +1,28 @@
+<svg width="2048" height="132" viewBox="0 0 2048 132" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Horizontal truss">
+  <defs>
+    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7f8ea6" stop-opacity="0.9"/>
+      <stop offset="0.4" stop-color="#445067" stop-opacity="0.96"/>
+      <stop offset="1" stop-color="#1b2230" stop-opacity="0.98"/>
+    </linearGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b2c7e8" stop-opacity="0.1"/>
+      <stop offset="0.45" stop-color="#d8e6ff" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#94a6c8" stop-opacity="0.12"/>
+    </linearGradient>
+    <pattern id="cross" width="160" height="84" patternUnits="userSpaceOnUse">
+      <rect width="160" height="84" fill="none"/>
+      <path d="M0 8H160M0 76H160" stroke="#7f93b8" stroke-opacity="0.52" stroke-width="2"/>
+      <path d="M4 78L78 6M82 6L156 78M4 6L78 78M82 78L156 6" stroke="#8ea3c8" stroke-opacity="0.45" stroke-width="2"/>
+      <circle cx="12" cy="12" r="3" fill="#d8e6ff" fill-opacity="0.42"/>
+      <circle cx="148" cy="12" r="3" fill="#d8e6ff" fill-opacity="0.42"/>
+      <circle cx="12" cy="72" r="3" fill="#d8e6ff" fill-opacity="0.42"/>
+      <circle cx="148" cy="72" r="3" fill="#d8e6ff" fill-opacity="0.42"/>
+    </pattern>
+  </defs>
+
+  <rect x="0" y="4" width="2048" height="124" rx="10" fill="url(#metal)" stroke="#93a8cf" stroke-opacity="0.5"/>
+  <rect x="12" y="24" width="2024" height="84" rx="5" fill="url(#cross)"/>
+  <rect x="0" y="4" width="2048" height="14" fill="url(#beam)" fill-opacity="0.95"/>
+  <rect x="0" y="114" width="2048" height="10" fill="#0b0f18" fill-opacity="0.75"/>
+</svg>
